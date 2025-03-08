@@ -1,0 +1,52 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+import warnings
+
+data = pd.read_csv(r"C:\Users\91903\OneDrive\Documents\archive (4)\Churn_Modelling.csv")
+
+print(data.isnull().sum())
+
+encoder = LabelEncoder()
+data['Geography'] = encoder.fit_transform(data['Geography'])
+data['Gender'] = encoder.fit_transform(data['Gender'])
+
+data = data.drop(['RowNumber', 'CustomerId', 'Surname'], axis=1)
+
+scaler = StandardScaler()
+scale_cols = ['CreditScore', 'Age', 'Tenure', 'Balance', 'NumOfProducts', 'EstimatedSalary']
+data[scale_cols] = scaler.fit_transform(data[scale_cols])
+
+X = data.drop('Exited', axis=1)
+y = data['Exited']
+Xtrain, Xtest, ytrain, ytest = train_test_split(X, y, test_size=0.2, random_state=42)
+
+model = LogisticRegression()
+model.fit(Xtrain, ytrain)
+ypred = model.predict(Xtest)
+print("Logistic Regression Results:")
+print(classification_report(ytest, ypred))
+print(confusion_matrix(ytest, ypred))
+print("Accuracy:", accuracy_score(ytest, ypred))
+
+model = GradientBoostingClassifier()
+model.fit(Xtrain, ytrain)
+ypred = model.predict(Xtest)
+print("\nGradient Boosting Classifier Results:")
+print(classification_report(ytest, ypred))
+print(confusion_matrix(ytest, ypred))
+print("Accuracy:", accuracy_score(ytest, ypred))
+
+model = RandomForestClassifier()
+model.fit(Xtrain, ytrain)
+ypred = model.predict(Xtest)
+print("\nRandom Forest Classifier Results:")
+print(classification_report(ytest, ypred))
+print(confusion_matrix(ytest, ypred))
+print("Accuracy:", accuracy_score(ytest, ypred))
